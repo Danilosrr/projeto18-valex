@@ -1,4 +1,4 @@
-import { connection } from "../database.js";
+import { connection } from "../../database.js";
 
 export interface Company {
   id: number;
@@ -13,4 +13,8 @@ export async function findByApiKey(apiKey: string) {
   );
 
   return result.rows[0];
+}
+
+export const companyRepository = {
+  findByApiKey
 }
