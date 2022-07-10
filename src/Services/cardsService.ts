@@ -1,7 +1,12 @@
-import { forbidden } from "joi";
+import { faker } from "@faker-js/faker";
+import Cryptr from "cryptr";
 import { forbiddenError } from "../Middlewares/errorHandler.js";
-import { cardRepository, TransactionTypes } from "../repositories/cardRepository.js";
-import { dateExpired, formatDate } from "../utils/formatUtils.js";
+import { Card, CardInsertData, cardRepository, TransactionTypes } from "../repositories/cardRepository.js";
+import { Employee } from "../repositories/employeeRepository.js";
+import { dateExpired, expireDate, formatDate, formatName } from "../utils/formatUtils.js";
+
+const cryptrKey = process.env.CRYPTR_KEY || 'cryptr'
+const cryptr = new Cryptr(cryptrKey)
 
 async function cardAvailability(employeeId:number,type:TransactionTypes){
     //true == available
@@ -24,6 +29,30 @@ async function cardAvailability(employeeId:number,type:TransactionTypes){
     return true;
 }
 
+async function insertCard(employee:Employee,type:TransactionTypes){
+    const number = faker.finance.creditCardNumber("#### #### #### ####");
+    const unincryptedCVV = faker.finance.creditCardCVV();
+    const cardCVV = cryptr.encrypt(unincryptedCVV);
+  
+    const card:CardInsertData = {
+      number,
+      expirationDate: expireDate(new Date()),
+      isBlocked: false,
+      employeeId: employee.id,
+      cardholderName: formatName(employee.fullName),
+      securityCode: cardCVV,
+      password: null,
+      isVirtual: true,
+      originalCardId: null,
+      type,
+    };
+  
+    const newCard = await cardRepository.insert(card);
+    console.log(number, unincryptedCVV);
+    return newCard
+}
+
 export const cardsService = {
-    cardAvailability
+    cardAvailability,
+    insertCard
 }

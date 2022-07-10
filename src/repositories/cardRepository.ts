@@ -22,10 +22,6 @@ export interface Card {
   type: TransactionTypes;
 }
 
-interface search {
-  exists: boolean;
-}
-
 export type CardInsertData = Omit<Card, "id">;
 export type CardUpdateData = Partial<Card>;
 
