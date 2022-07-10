@@ -22,6 +22,10 @@ export interface Card {
   type: TransactionTypes;
 }
 
+interface search {
+  exists: boolean;
+}
+
 export type CardInsertData = Omit<Card, "id">;
 export type CardUpdateData = Partial<Card>;
 
@@ -62,6 +66,15 @@ export async function findByCardDetails(
       FROM cards 
       WHERE number=$1 AND "cardholderName"=$2 AND "expirationDate"=$3`,
     [number, cardholderName, expirationDate]
+  );
+
+  return result.rows[0];
+}
+
+export async function searchEmployeeCardType(employeeId:number,type:TransactionTypes){
+  const result = await connection.query<Card, [number, TransactionTypes]>(
+    `SELECT * FROM cards WHERE id=$1 and type=$2`,
+    [employeeId,type]
   );
 
   return result.rows[0];
@@ -128,6 +141,7 @@ export const cardRepository = {
   findById,
   findByTypeAndEmployeeId,
   findByCardDetails,
+  searchEmployeeCardType,
   insert,
   update,
   remove

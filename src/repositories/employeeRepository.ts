@@ -8,10 +8,6 @@ export interface Employee {
   companyId: number;
 }
 
-interface search {
-  exists: boolean;
-}
-
 export async function findById(id: number) {
   const result = await connection.query<Employee, [number]>(
     "SELECT * FROM employees WHERE id=$1",
@@ -22,12 +18,12 @@ export async function findById(id: number) {
 }
 
 export async function searchEmployeeAtCompany(employeeId:number,companyId:number){
-  const result = await connection.query<search, [number, number]>(
-    `SELECT EXISTS (SELECT FROM employees WHERE id=$1 and "companyId"=$2)`,
+  const result = await connection.query<Employee, [number, number]>(
+    `SELECT * FROM employees WHERE id=$1 and "companyId"=$2`,
     [employeeId,companyId]
   );
 
-  return result.rows[0].exists;
+  return result.rows[0];
 }
 
 export const employeeRepository ={
