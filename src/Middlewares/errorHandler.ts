@@ -5,6 +5,7 @@ const errorStatusCode = {
     conflict: 409,
     unprocessable_entity: 422,
     not_found: 404,
+    forbidden: 403,
     bad_request: 400,
     invalid_token: 498,
 }
@@ -23,6 +24,9 @@ export function unprocessableEntityError(text?:string){
 }
 export function notFoundError(text?:string){
     return { type: "not_found", message: text }
+}
+export function forbiddenError(text?:string){
+    return { type: "forbidden", message: text }
 }
 export function invalidTokenError(text?:string){
     return { type: "invalid_token", message: text }

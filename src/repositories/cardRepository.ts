@@ -122,3 +122,13 @@ export async function update(id: number, cardData: CardUpdateData) {
 export async function remove(id: number) {
   connection.query<any, [number]>("DELETE FROM cards WHERE id=$1", [id]);
 }
+
+export const cardRepository = {
+  find,
+  findById,
+  findByTypeAndEmployeeId,
+  findByCardDetails,
+  insert,
+  update,
+  remove
+}
