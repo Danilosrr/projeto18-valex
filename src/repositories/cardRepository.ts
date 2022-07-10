@@ -69,7 +69,7 @@ export async function findByCardDetails(
 
 export async function searchEmployeeCardType(employeeId:number,type:TransactionTypes){
   const result = await connection.query<Card, [number, TransactionTypes]>(
-    `SELECT * FROM cards WHERE id=$1 and type=$2`,
+    `SELECT * FROM cards WHERE "employeeId"=$1 and type=$2`,
     [employeeId,type]
   );
 

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { failedDependencyError, forbiddenError } from "../Middlewares/errorHandler.js";
+import { failedDependencyError, forbiddenError, unprocessableEntityError } from "../Middlewares/errorHandler.js";
 import { CardInsertData, cardRepository, TransactionTypes } from "../repositories/cardRepository.js";
 import { employeeRepository } from "../repositories/employeeRepository.js";
 import { cardsService } from "../Services/cardsService.js";
@@ -16,9 +16,13 @@ export async function createCard(req:Request,res:Response){
 
     const cardAvailability = await cardsService.cardAvailability(employeeId,type); // true = available
     if (!cardAvailability){
-        throw failedDependencyError("card type not availabe, creation failed!");
+        throw failedDependencyError("card availability error, creation failed!");
     }
 
     const insertCard = await cardsService.insertCard(EmployeeAtCompany,type);
+    if (!insertCard){
+        throw failedDependencyError("card info registry error, creation failed!");
+    }
+
     return res.send(insertCard);
 }

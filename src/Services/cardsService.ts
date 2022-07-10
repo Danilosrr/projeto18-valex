@@ -1,9 +1,9 @@
 import { faker } from "@faker-js/faker";
 import Cryptr from "cryptr";
 import { forbiddenError } from "../Middlewares/errorHandler.js";
-import { Card, CardInsertData, cardRepository, TransactionTypes } from "../repositories/cardRepository.js";
+import { CardInsertData, cardRepository, TransactionTypes } from "../repositories/cardRepository.js";
 import { Employee } from "../repositories/employeeRepository.js";
-import { dateExpired, expireDate, formatDate, formatName } from "../utils/formatUtils.js";
+import { dateExpired, expireDate, formatName } from "../utils/formatUtils.js";
 
 const cryptrKey = process.env.CRYPTR_KEY || 'cryptr'
 const cryptr = new Cryptr(cryptrKey)
@@ -48,8 +48,9 @@ async function insertCard(employee:Employee,type:TransactionTypes){
     };
   
     const newCard = await cardRepository.insert(card);
+
     console.log(number, unincryptedCVV);
-    return newCard
+    return { number, unincryptedCVV };
 }
 
 export const cardsService = {
