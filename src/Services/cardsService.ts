@@ -1,17 +1,14 @@
 import { faker } from "@faker-js/faker";
-import Cryptr from "cryptr";
 import { forbiddenError } from "../Middlewares/errorHandler.js";
-import { CardInsertData, cardRepository, TransactionTypes } from "../repositories/cardRepository.js";
+import { Card, CardInsertData, cardRepository, TransactionTypes } from "../repositories/cardRepository.js";
 import { Employee } from "../repositories/employeeRepository.js";
-import { dateExpired, expireDate, formatName } from "../utils/formatUtils.js";
+import { dateExpired, decrypt, encrypt, expireDate, formatName } from "../utils/formatUtils.js";
 
-const cryptrKey = process.env.CRYPTR_KEY || 'cryptr'
-const cryptr = new Cryptr(cryptrKey)
 
 async function cardAvailability(employeeId:number,type:TransactionTypes){
     //true == available
-    const cardExists = await cardRepository.searchEmployeeCardType(employeeId,type);
 
+    const cardExists = await cardRepository.searchEmployeeCardType(employeeId,type);
     if(!!cardExists){
         const { expirationDate, isBlocked } = cardExists;
         const cardExpired = dateExpired(new Date(),expirationDate);
@@ -31,8 +28,8 @@ async function cardAvailability(employeeId:number,type:TransactionTypes){
 
 async function insertCard(employee:Employee,type:TransactionTypes){
     const number = faker.finance.creditCardNumber("#### #### #### ####");
-    const unincryptedCVV = faker.finance.creditCardCVV();
-    const cardCVV = cryptr.encrypt(unincryptedCVV);
+    const unincryptedCVC = faker.finance.creditCardCVV();
+    const cardCVC = encrypt(unincryptedCVC);
   
     const card:CardInsertData = {
       number,
@@ -40,7 +37,7 @@ async function insertCard(employee:Employee,type:TransactionTypes){
       isBlocked: false,
       employeeId: employee.id,
       cardholderName: formatName(employee.fullName),
-      securityCode: cardCVV,
+      securityCode: cardCVC,
       password: null,
       isVirtual: true,
       originalCardId: null,
@@ -49,11 +46,31 @@ async function insertCard(employee:Employee,type:TransactionTypes){
   
     const newCard = await cardRepository.insert(card);
 
-    console.log(number, unincryptedCVV);
-    return { number, unincryptedCVV };
+    console.log(number, unincryptedCVC);
+    return { number, unincryptedCVC };
+}
+
+async function checkCVC(cards:Card[],CVV:number){
+    const selectedCard:Card[] = [];
+    cards.forEach(card => {
+        if(+decrypt(card.securityCode) == CVV){
+            selectedCard.push(card);
+        };
+    });
+
+    return selectedCard;
+}
+
+async function createCardPassword(id:number,newPassword:string){
+    const password = encrypt(newPassword);
+    const updatePassword = await cardRepository.update(id, { password });
+
+    return updatePassword;
 }
 
 export const cardsService = {
     cardAvailability,
-    insertCard
+    createCardPassword,
+    insertCard,
+    checkCVC,
 }

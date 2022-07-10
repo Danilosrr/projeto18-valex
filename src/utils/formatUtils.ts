@@ -1,3 +1,5 @@
+import Cryptr from "cryptr";
+
 export function formatDate(data:Date){
     const month = data.getUTCMonth()+1;
     const year = data.getUTCFullYear();
@@ -47,4 +49,22 @@ export function formatName(name: string) {
         }
     })
     return nameShortened.join(" ");
+};
+
+export function encrypt(decryptedPassword){
+    const cryptrKey = process.env.CRYPTR_KEY || 'cryptr';
+    const cryptr = new Cryptr(cryptrKey);
+
+    const encryptedPassword = cryptr.encrypt(decryptedPassword);
+
+    return encryptedPassword;
+};
+
+export function decrypt(encryptedPassword){
+    const cryptrKey = process.env.CRYPTR_KEY || 'cryptr';
+    const cryptr = new Cryptr(cryptrKey);
+
+    const decryptedPassword = cryptr.decrypt(encryptedPassword);
+
+    return decryptedPassword;
 };

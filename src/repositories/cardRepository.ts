@@ -30,13 +30,13 @@ export async function find() {
   return result.rows;
 }
 
-export async function findById(id: number) {
+export async function findByEmployeeId(id: number) {
   const result = await connection.query<Card, [number]>(
-    "SELECT * FROM cards WHERE id=$1",
+    `SELECT * FROM cards WHERE "employeeId"=$1`,
     [id]
   );
 
-  return result.rows[0];
+  return result.rows;
 }
 
 export async function findByTypeAndEmployeeId(
@@ -134,7 +134,7 @@ export async function remove(id: number) {
 
 export const cardRepository = {
   find,
-  findById,
+  findByEmployeeId,
   findByTypeAndEmployeeId,
   findByCardDetails,
   searchEmployeeCardType,

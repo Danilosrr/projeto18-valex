@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
-import { failedDependencyError, forbiddenError, unprocessableEntityError } from "../Middlewares/errorHandler.js";
-import { CardInsertData, cardRepository, TransactionTypes } from "../repositories/cardRepository.js";
+import { conflictError, failedDependencyError, forbiddenError, notFoundError } from "../Middlewares/errorHandler.js";
+import { Card, cardRepository, TransactionTypes } from "../repositories/cardRepository.js";
 import { employeeRepository } from "../repositories/employeeRepository.js";
 import { cardsService } from "../Services/cardsService.js";
-import { expireDate, formatName } from "../utils/formatUtils.js";
 
 export async function createCard(req:Request,res:Response){
-    const { employeeId, type }:{ employeeId:number, type:TransactionTypes } = req.body
+    const { employeeId, type }:{ employeeId:number, type:TransactionTypes } = req.body;
     const company = res.locals.company;
 
     const EmployeeAtCompany = await employeeRepository.searchEmployeeAtCompany(employeeId,company.id);
@@ -25,4 +24,26 @@ export async function createCard(req:Request,res:Response){
     }
 
     return res.send(insertCard);
+}
+
+export async function activateCard(req:Request,res:Response){
+    const { employeeId, CVC, password }:{ employeeId:number, CVC:number, password:string } = req.body;
+
+    const cardsExists = await cardRepository.findByEmployeeId(employeeId)
+    if(cardsExists.length<1){
+        throw notFoundError("no cards found!");
+    }
+
+    const matchingCVC = await cardsService.checkCVC(cardsExists,+CVC);
+    if(matchingCVC.length<1){
+        throw notFoundError("no cards matching CVC found!");
+    }
+
+    const matchingCard:Card = matchingCVC[0];
+    if(matchingCard.password != null){
+        throw conflictError("matching card has already been activated!");
+    }
+
+    const createCardPassword = await cardsService.createCardPassword(matchingCard.id, password)
+    return res.send('Card is now Active.');
 }
