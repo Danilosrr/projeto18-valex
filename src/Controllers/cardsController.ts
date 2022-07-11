@@ -118,3 +118,14 @@ export async function unblockCard(req:Request,res:Response){
     const blockCard = await cardRepository.update(id,{ isBlocked:false });
     return res.send({ message: 'Card is now unblocked', password: matchingPassword });
 }
+
+export async function cardBalance(req:Request,res:Response){
+    const cardId:number = +req.params.id;
+    
+    const balance = await cardsService.cardBalance(cardId);
+    if(!balance){
+        throw notFoundError('could not retrive card balance');
+    }
+    
+    res.send(balance);
+}
