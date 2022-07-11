@@ -25,3 +25,8 @@ export async function insert(rechargeData: RechargeInsertData) {
     [cardId, amount]
   );
 }
+
+export const rechargeRepository = {
+  findByCardId,
+  insert
+};

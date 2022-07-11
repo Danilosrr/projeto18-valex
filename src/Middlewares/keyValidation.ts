@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { companyRepository } from "../repositories/companyRepository.js";
-import { invalidTokenError, notFoundError } from "./errorHandler.js";
+import { Company, companyRepository } from "../repositories/companyRepository.js";
+import { invalidTokenError } from "./errorHandler.js";
 
 export default async function validKey(req:Request,res:Response,next:NextFunction){
     
@@ -9,7 +9,7 @@ export default async function validKey(req:Request,res:Response,next:NextFunctio
         throw invalidTokenError("missing key");
     }
 
-    const company = await companyRepository.findByApiKey(key.toString())
+    const company:Company | undefined = await companyRepository.findByApiKey(key.toString())
     if (!company){
         throw invalidTokenError("unregistered key");
     }

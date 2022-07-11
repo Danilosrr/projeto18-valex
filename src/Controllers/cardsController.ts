@@ -36,6 +36,11 @@ export async function activateCard(req:Request,res:Response){
         throw notFoundError("no cards found!");
     }
 
+    const cardExpired = dateExpired(new Date(),cardsExists.expirationDate);
+    if(cardExpired){
+        throw forbiddenError("Card is expired!");
+    }
+
     const matchingCVC:Card | undefined = await cardsService.checkCVC(cardsExists,+CVC);
     if(!matchingCVC){
         throw notFoundError("no cards matching CVC found!");
