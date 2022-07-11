@@ -1,5 +1,8 @@
 import { connection } from "../../database.js";
 
+export interface Sum {
+  sum: number;
+}
 export interface Payment {
   id: number;
   cardId: number;
@@ -33,3 +36,18 @@ export async function insert(paymentData: PaymentInsertData) {
     [cardId, businessId, amount]
   );
 }
+
+export async function balanceByCardId(cardId: number) {
+  const result = await connection.query<Sum, [number]>(
+    `SELECT SUM(amount) FROM payments WHERE "cardId"=$1`,
+    [cardId]
+  );
+
+  return result.rows[0].sum;
+}
+
+export const paymentRepository = {
+  findByCardId,
+  balanceByCardId,
+  insert
+};

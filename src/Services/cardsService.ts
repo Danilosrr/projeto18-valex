@@ -60,7 +60,7 @@ async function checkCVC(card:Card,CVV:number){
 }
 
 async function checkPassword(card:Card,password:number){
-    const decryptedPassword = decrypt(card.password);
+    const decryptedPassword:string = decrypt(card.password);
 
     if(+decryptedPassword == password){
         return decryptedPassword;
@@ -69,7 +69,7 @@ async function checkPassword(card:Card,password:number){
 }
 
 async function createCardPassword(id:number,newPassword:string){
-    const password = encrypt(newPassword);
+    const password:string = encrypt(newPassword);
     const updatePassword = await cardRepository.update(id, { password });
 
     return updatePassword;
