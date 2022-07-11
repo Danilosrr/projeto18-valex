@@ -73,11 +73,43 @@ export async function blockCard(req:Request,res:Response){
         throw notFoundError("no cards matching CVC found!");
     }
     
-    const matchingPassword:Card | undefined = await cardsService.checkPassword(cardsExists,+password);
+    const matchingPassword:string | undefined = await cardsService.checkPassword(cardsExists,+password);
     if(!matchingPassword){
         throw conflictError("password not matching.");
     }
 
     const blockCard = await cardRepository.update(id,{ isBlocked:true });
-    return res.send('Card is now blocked.');
+    return res.send({ message: 'Card is now blocked', password: matchingPassword });
+}
+
+export async function unblockCard(req:Request,res:Response){
+    const id:number = +req.params.id;
+    const { CVC, password }:{ CVC:number, password:string } = req.body;
+
+    const cardsExists:Card = await cardRepository.findById(id)
+    if(!cardsExists){
+        throw notFoundError("no cards found!");
+    }
+
+    if(!cardsExists.isBlocked){
+        throw forbiddenError("Card is already unblocked!");
+    }
+
+    const cardExpired = dateExpired(new Date(),cardsExists.expirationDate);
+    if(cardExpired){
+        throw forbiddenError("Card is expired!");
+    }
+
+    const matchingCVC:Card | undefined = await cardsService.checkCVC(cardsExists,+CVC);
+    if(!matchingCVC){
+        throw notFoundError("no cards matching CVC found!");
+    }
+    
+    const matchingPassword:string | undefined = await cardsService.checkPassword(cardsExists,+password);
+    if(!matchingPassword){
+        throw conflictError("password not matching.");
+    }
+
+    const blockCard = await cardRepository.update(id,{ isBlocked:false });
+    return res.send({ message: 'Card is now unblocked', password: matchingPassword });
 }

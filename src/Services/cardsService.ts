@@ -63,7 +63,7 @@ async function checkPassword(card:Card,password:number){
     const decryptedPassword = decrypt(card.password);
 
     if(+decryptedPassword == password){
-        return card;
+        return decryptedPassword;
     }
     return undefined;
 }
