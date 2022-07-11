@@ -50,15 +50,22 @@ async function insertCard(employee:Employee,type:TransactionTypes){
     return { number, unincryptedCVC };
 }
 
-async function checkCVC(cards:Card[],CVV:number){
-    const selectedCard:Card[] = [];
-    cards.forEach(card => {
-        if(+decrypt(card.securityCode) == CVV){
-            selectedCard.push(card);
-        };
-    });
+async function checkCVC(card:Card,CVV:number){
+    const decryptedCVV = decrypt(card.securityCode);
 
-    return selectedCard;
+    if(+decryptedCVV == CVV){
+        return card;
+    }
+    return undefined;
+}
+
+async function checkPassword(card:Card,password:number){
+    const decryptedPassword = decrypt(card.password);
+
+    if(+decryptedPassword == password){
+        return card;
+    }
+    return undefined;
 }
 
 async function createCardPassword(id:number,newPassword:string){
@@ -73,4 +80,5 @@ export const cardsService = {
     createCardPassword,
     insertCard,
     checkCVC,
+    checkPassword,
 }

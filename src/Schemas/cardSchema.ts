@@ -6,7 +6,11 @@ export const createCardSchema = joi.object({
 });
 
 export const activateCardSchema = joi.object({
-    employeeId: joi.number().integer().required(),
+    password: joi.string().pattern(/^([0-9]{4})$/).required(),
+    CVC: joi.string().pattern(/^([0-9]{3})$/).required()
+});
+
+export const blockCardSchema = joi.object({
     password: joi.string().pattern(/^([0-9]{4})$/).required(),
     CVC: joi.string().pattern(/^([0-9]{3})$/).required()
 });
