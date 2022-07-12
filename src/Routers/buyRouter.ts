@@ -5,6 +5,6 @@ import { buySchema } from "../Schemas/buySchema.js";
 
 const buyRouter = Router();
 
-buyRouter.post('/buy/', validSchema(buySchema), createPayment);
+buyRouter.post('/buy', validSchema(buySchema), createPayment);
 
 export default buyRouter;

@@ -12,7 +12,7 @@ export async function createPayment(req:Request,res:Response){
 
     const selectedCard:Card | undefined = await cardRepository.findById(cardId);
     if(!selectedCard){
-        notFoundError("card doesnt exist")
+        throw notFoundError("card doesnt exist")
     }
     if(!selectedCard.password){
         throw forbiddenError("Card was not activated.");
@@ -28,7 +28,7 @@ export async function createPayment(req:Request,res:Response){
 
     const pointOfSale:Business | undefined = await businessRepository.findById(businessId);
     if(!pointOfSale){
-        notFoundError("point of sale doesnt exist")
+        throw notFoundError("point of sale doesnt exist")
     }
 
     const matchingType = selectedCard.type === pointOfSale.type;
