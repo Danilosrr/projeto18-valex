@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "build": "tsc",
-	  "start": "node dist/server.js",
+    "start": "node dist/server.js",
     "dev": "nodemon server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -35,6 +35,7 @@
     "express": "^4.18.1",
     "express-async-errors": "^3.1.1",
     "joi": "^17.6.0",
-    "pg": "^8.7.3"
+    "pg": "^8.7.3",
+    "string-strip-html": "^10.0.0"
   }
 }
