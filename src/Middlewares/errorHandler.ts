@@ -40,5 +40,6 @@ export default function handleErrors(error,req:Request,res:Response,next:NextFun
     if (error.type){
         return res.status(errorStatusCode[error.type]).send(error.message);
     }
+    console.log(error);
     return res.sendStatus(500);
 }
